@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🎉 HAPPY BIRTHDAY LINUS 🎉</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { box-sizing: border-box; }
+  html,body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    text-align: center;
+    color: #fff;
+  }
+  body {
+    background: linear-gradient(-45deg, #ff6ec4, #7873f5, #4ADEDE, #f9d423, #ff4e50, #2ecc71);
+    background-size: 600% 600%;
+    animation: bgshift 8s ease infinite;
+  }
+  body.disco { animation: bgshift 1.2s linear infinite, discoflash 0.4s steps(1) infinite; }
+  @keyframes bgshift {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+  @keyframes discoflash {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    50% { filter: hue-rotate(180deg) brightness(1.3); }
+    100% { filter: hue-rotate(360deg) brightness(1); }
+  }
+  body.shake { animation: bgshift 8s ease infinite, screenshake 0.4s ease; }
+  @keyframes screenshake {
+    0%,100% { transform: translate(0,0) rotate(0); }
+    20% { transform: translate(-12px,8px) rotate(-1deg); }
+    40% { transform: translate(10px,-10px) rotate(1deg); }
+    60% { transform: translate(-8px,10px) rotate(-1deg); }
+    80% { transform: translate(12px,-6px) rotate(1deg); }
+  }
+
+  #startScreen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #7873f5, #2b1055);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: opacity 0.8s ease;
+  }
+  #startScreen h1 {
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    text-shadow: 3px 3px 0 #ff6ec4;
+    padding: 0 20px;
+  }
+  #startBtn {
+    font-size: 1.5em;
+    padding: 20px 45px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(90deg, #f9d423, #ff4e50);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,255,255,0.6);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  #content { display: none; padding: 20px; position: relative; z-index: 2; }
+
+  h1.title {
+    font-size: 3em;
+    margin: 20px 0 6px;
+    background: linear-gradient(90deg, #ff6ec4, #f9d423, #4ADEDE, #ff4e50, #ff6ec4);
+    background-size: 400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: wiggle 2s ease-in-out infinite, rainbowtext 3s linear infinite;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+  }
+  @keyframes rainbowtext {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+  }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+
+  .subtitle {
+    font-size: 1.4em;
+    margin-bottom: 14px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+
+  .balloons { font-size: 2.5em; margin: 6px 0; }
+  .balloons span {
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+    margin: 0 6px;
+  }
+  .balloons span:nth-child(odd) { animation-delay: 0.5s; }
+  .balloons span:nth-child(3n) { animation-delay: 1s; }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-25px) rotate(3deg); }
+  }
+
+  /* ---------- Photo carousel ---------- */
+  .carousel-wrap {
+    max-width: 420px;
+    margin: 20px auto;
+    position: relative;
+  }
+  .carousel {
+    position: relative;
+    width: 340px;
+    height: 340px;
+    margin: 0 auto;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+    background: rgba(255,255,255,0.15);
+    perspective: 1000px;
+  }
+  .carousel img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    border: 6px solid white;
+    opacity: 0;
+    transform: scale(0.85) rotate(8deg);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .carousel img.active {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    z-index: 5;
+  }
+  .carousel-caption {
+    margin-top: 14px;
+    font-size: 1.1em;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    min-height: 1.4em;
+  }
+  .dots { margin-top: 10px; }
+  .dots span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    margin: 0 4px;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .dots span.active { background: #fff; transform: scale(1.4); }
+
+  .thumb-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 800px;
+    margin: 25px auto 10px;
+    padding: 0 15px;
+  }
+  .thumb-strip img {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 3px solid rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    opacity: 0.75;
+  }
+  .thumb-strip img:hover { transform: scale(1.15) rotate(-4deg); opacity: 1; }
+  .thumb-strip img.active-thumb {
+    border-color: #f9d423;
+    opacity: 1;
+    transform: scale(1.12);
+  }
+
+  .message {
+    max-width: 700px;
+    margin: 30px auto;
+    font-size: 1.25em;
+    background: rgba(255,255,255,0.15);
+    padding: 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    line-height: 1.5em;
+  }
+
+  .buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin: 25px auto;
+  }
+  .buttons-row button {
+    font-size: 1.05em;
+    padding: 12px 22px;
+    border-radius: 40px;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    color: #7873f5;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease;
+  }
+  .buttons-row button:active { transform: scale(0.92); }
+  .buttons-row button:hover { transform: translateY(-3px) scale(1.05); }
+
+  canvas#confetti, canvas#fireworks {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 500;
+  }
+
+  .flying-emoji {
+    position: fixed;
+    font-size: 2em;
+    pointer-events: none;
+    z-index: 600;
+    animation: flyup 3s ease-in forwards;
+  }
+  @keyframes flyup {
+    0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100vh) scale(1.6) rotate(360deg); opacity: 0; }
+  }
+
+  footer {
+    margin: 40px 0 20px;
+    font-size: 1.1em;
+    opacity: 0.9;
+  }
+
+  .spin-mode #content { animation: spinit 4s linear; }
+  @keyframes spinit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>🎂 A CHAOTIC surprise for Linus is loading... 🎂</h1>
+  <button id="startBtn">🎉 CLICK TO UNLEASH THE PARTY 🎉</button>
+</div>
+
+<canvas id="confetti"></canvas>
+<canvas id="fireworks"></canvas>
+
+<div id="content">
+  <h1 class="title">🎉 HAPPY BIRTHDAY LINUS! 🎉</h1>
+  <div class="subtitle">The one, the only, the absolute legend 🥳</div>
+  <div class="balloons">
+    <span>🎈</span><span>🎁</span><span>🎈</span><span>🥳</span><span>🎈</span><span>🎊</span>
+  </div>
+
+  <div class="carousel-wrap">
+    <div class="carousel" id="carousel"></div>
+    <div class="carousel-caption" id="caption">Loading the legend's greatest hits...</div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="thumb-strip" id="thumbStrip"></div>
+
+  <div class="message">
+    🎉 Wishing you the biggest, loudest, most ridiculous happy birthday, Linus!
+    Here's to another year of chaos, laughs, and unforgettable memories.
+    You deserve confetti raining from the sky (literally, look up 👆), fireworks
+    exploding in your honor, and a day as awesome as you are. Enjoy your day, legend! 🥂🎂🎈
+  </div>
+
+  <div class="buttons-row">
+    <button id="confettiBtn">🎊 MORE CONFETTI</button>
+    <button id="fireworksBtn">🎆 FIREWORKS</button>
+    <button id="discoBtn">🕺 DISCO MODE</button>
+    <button id="shakeBtn">💥 SHAKE IT</button>
+    <button id="emojiBtn">🚀 EMOJI STORM</button>
+    <button id="replayBtn">🎵 PLAY SONG AGAIN</button>
+  </div>
+
+  <footer>Made with 💛 (and way too much chaos) just for you, Linus</footer>
+</div>
+
+<script>
+// ---------- Photo list ----------
+const photos = [];
+for (let i = 1; i <= 13; i++) photos.push(`image${i}.jpg`);
+const captions = [
+  "Linus in his natural habitat 😎",
+  "10/10 no notes 🔥",
+  "Iconic. Legendary. Unmatched.",
+  "This one deserves a frame 🖼️",
+  "Certified main character energy ⭐",
+  "Absolute vibes only ✨",
+  "The GOAT himself 🐐",
+  "Chef's kiss 👌",
+  "Big mood 😄",
+  "Certified banger of a photo 📸",
+  "Pure gold 🏆",
+  "Never not iconic",
+  "Save this one forever 💛"
+];
+
+const carousel = document.getElementById('carousel');
+const dotsWrap = document.getElementById('dots');
+const thumbStrip = document.getElementById('thumbStrip');
+const caption = document.getElementById('caption');
+
+photos.forEach((src, i) => {
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = 'Linus photo ' + (i+1);
+  if (i === 0) img.classList.add('active');
+  carousel.appendChild(img);
+
+  const dot = document.createElement('span');
+  if (i === 0) dot.classList.add('active');
+  dotsWrap.appendChild(dot);
+
+  const thumb = document.createElement('img');
+  thumb.src = src;
+  if (i === 0) thumb.classList.add('active-thumb');
+  thumb.addEventListener('click', () => showSlide(i));
+  thumbStrip.appendChild(thumb);
+});
+
+let currentSlide = 0;
+function showSlide(idx){
+  const imgs = carousel.querySelectorAll('img');
+  const dots = dotsWrap.querySelectorAll('span');
+  const thumbs = thumbStrip.querySelectorAll('img');
+  imgs[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  thumbs[currentSlide].classList.remove('active-thumb');
+  currentSlide = idx % photos.length;
+  imgs[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+  thumbs[currentSlide].classList.add('active-thumb');
+  caption.textContent = captions[currentSlide % captions.length];
+}
+let carouselTimer = null;
+function startCarousel(){
+  showSlide(0);
+  carouselTimer = setInterval(() => showSlide(currentSlide + 1), 2600);
+}
+
+// ---------- Confetti ----------
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+function resize(){
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  fwCanvas.width = window.innerWidth; fwCanvas.height = window.innerHeight;
+}
+const fwCanvas = document.getElementById('fireworks');
+const fwCtx = fwCanvas.getContext('2d');
+resize();
+window.addEventListener('resize', resize);
+
+let confettiPieces = [];
+const colors = ['#ff6ec4','#f9d423','#4ADEDE','#7873f5','#ff4e50','#2ecc71'];
+
+function spawnConfetti(count){
+  for(let i=0;i<count;i++){
+    confettiPieces.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height,
+      size: 6 + Math.random()*8,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      speedY: 2 + Math.random()*4,
+      speedX: -2 + Math.random()*4,
+      rotation: Math.random()*360,
+      rotSpeed: -6 + Math.random()*12
+    });
+  }
+}
+
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confettiPieces.forEach(p => {
+    p.y += p.speedY;
+    p.x += p.speedX;
+    p.rotation += p.rotSpeed;
+    if(p.y > canvas.height + 20){
+      p.y = -20;
+      p.x = Math.random()*canvas.width;
+    }
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation * Math.PI/180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+    ctx.restore();
+  });
+  requestAnimationFrame(animateConfetti);
+}
+
+// ---------- Fireworks ----------
+let fwParticles = [];
+function launchFirework(x, y){
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  const count = 40;
+  for(let i=0;i<count;i++){
+    const angle = (Math.PI*2*i)/count;
+    const speed = 2 + Math.random()*4;
+    fwParticles.push({
+      x, y,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed,
+      alpha: 1,
+      color
+    });
+  }
+}
+function randomFirework(){
+  launchFirework(
+    Math.random()*fwCanvas.width,
+    Math.random()*fwCanvas.height*0.5 + 40
+  );
+}
+function animateFireworks(){
+  fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
+  fwParticles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.03;
+    p.alpha -= 0.012;
+    fwCtx.globalAlpha = Math.max(p.alpha,0);
+    fwCtx.fillStyle = p.color;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x, p.y, 3, 0, Math.PI*2);
+    fwCtx.fill();
+  });
+  fwParticles = fwParticles.filter(p => p.alpha > 0);
+  fwCtx.globalAlpha = 1;
+  requestAnimationFrame(animateFireworks);
+}
+
+// ---------- Happy Birthday melody (Web Audio, public-domain tune) ----------
+function playHappyBirthday(){
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioCtx();
+  const notes = {
+    C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00,
+    A4:440.00, B4:493.88, C5:523.25, D5:587.33
+  };
+  const melody = [
+    ['C4',0.4],['C4',0.2],['D4',0.6],['C4',0.6],['F4',0.6],['E4',1.0],
+    ['C4',0.4],['C4',0.2],['D4',0.6],['C4',0.6],['G4',0.6],['F4',1.0],
+    ['C4',0.4],['C4',0.2],['C5',0.6],['A4',0.6],['F4',0.6],['E4',0.6],['D4',1.0],
+    ['B4',0.4],['B4',0.2],['A4',0.6],['F4',0.6],['G4',0.6],['F4',1.2]
+  ];
+  let t = audioCtx.currentTime + 0.2;
+  melody.forEach(([note, dur]) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = notes[note];
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.35, t + 0.05);
+    gain.gain.linearRampToValueAtTime(0, t + dur*0.95);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + dur);
+    t += dur;
+  });
+  return audioCtx;
+}
+
+// ---------- Flying emoji storm ----------
+const emojiList = ['🎉','🎈','🎂','🥳','🎁','✨','🍾','🎊','🚀','⭐'];
+function emojiStorm(){
+  for(let i=0;i<35;i++){
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'flying-emoji';
+      el.textContent = emojiList[Math.floor(Math.random()*emojiList.length)];
+      el.style.left = Math.random()*100 + 'vw';
+      el.style.bottom = '-40px';
+      el.style.fontSize = (1.5 + Math.random()*2) + 'em';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }, i*60);
+  }
+}
+
+// ---------- Start interaction ----------
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('startScreen').style.opacity = '0';
+  setTimeout(() => { document.getElementById('startScreen').style.display = 'none'; }, 800);
+  document.getElementById('content').style.display = 'block';
+
+  spawnConfetti(300);
+  animateConfetti();
+  animateFireworks();
+  playHappyBirthday();
+  startCarousel();
+  emojiStorm();
+
+  setInterval(() => spawnConfetti(60), 4000);
+  setInterval(randomFirework, 1800);
+});
+
+// ---------- Extra chaos buttons ----------
+document.getElementById('confettiBtn').addEventListener('click', () => spawnConfetti(300));
+document.getElementById('fireworksBtn').addEventListener('click', () => {
+  for(let i=0;i<6;i++) setTimeout(randomFirework, i*180);
+});
+document.getElementById('discoBtn').addEventListener('click', () => {
+  document.body.classList.toggle('disco');
+});
+document.getElementById('shakeBtn').addEventListener('click', () => {
+  document.body.classList.remove('shake');
+  void document.body.offsetWidth;
+  document.body.classList.add('shake');
+  for(let i=0;i<8;i++) setTimeout(randomFirework, i*100);
+});
+document.getElementById('emojiBtn').addEventListener('click', emojiStorm);
+document.getElementById('replayBtn').addEventListener('click', playHappyBirthday);
+</script>
+
+</body>
+</html>
